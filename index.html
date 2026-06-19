@@ -1,22 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GOURIKIコーポレーション BSサンキースタジオ</title>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GOURIKIコーポレーション サンキースタジオ</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%}
 .app{display:flex;flex-direction:column;width:100%;min-height:100vh;font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;background:#f0f0f0}
 h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;background:#fff;border-bottom:1px solid #ddd;flex-shrink:0}
+
+/* タブ */
+.tab-bar{display:flex;background:#fff;border-bottom:2px solid #ddd;flex-shrink:0;padding:0 16px;gap:2px}
+.tab-btn{padding:8px 20px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab-btn.active{color:#2196F3;border-bottom-color:#2196F3}
+.tab-btn:hover:not(.active){color:#555}
+
+.tab-panel{display:none;flex:1;flex-direction:column;min-height:0}
+.tab-panel.active{display:flex}
+
 .app-body{display:flex;flex:1;min-height:0}
 .sidebar{width:200px;min-width:200px;background:#fff;border-right:1px solid #ddd;display:flex;flex-direction:column;overflow:hidden}
-.sidebar-scroll{overflow-y:auto;flex-shrink:0}
-.sidebar-code{flex:1;display:flex;flex-direction:column;min-height:100px;border-top:1px solid #e8e8e8}
+.sidebar-scroll{overflow-y:auto;flex-shrink:0;max-height:calc(100vh - 200px)}
+.sidebar-code{flex:1;display:flex;flex-direction:column;min-height:80px;border-top:1px solid #e8e8e8}
 .code-box{flex:1;width:100%;border:none;padding:8px 10px;font-size:10px;font-family:monospace;color:#333;background:#fafafa;resize:none;line-height:1.6;outline:none}
 .code-box:focus{background:#fff}
 .sec-hdr{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:#f0f0f0;border-bottom:1px solid #e0e0e0;border-top:1px solid #e0e0e0;cursor:pointer;font-weight:700;font-size:11px;color:#333;user-select:none;flex-shrink:0}
 .sec-hdr:first-child{border-top:none}
 .sec-body{padding:6px 10px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid #eee;background:#fff}
 .frow{display:flex;align-items:center;gap:4px}
-.frow label{width:56px;color:#555;font-size:11px;flex-shrink:0}
+.frow label{width:62px;color:#555;font-size:11px;flex-shrink:0}
 .frow input[type=text],.frow select{flex:1;border:1px solid #ccc;border-radius:3px;padding:2px 4px;font-size:11px;color:#333;background:#fff}
 .sfield{display:flex;flex-direction:column;gap:1px}
 .sfield label{font-size:10px;color:#888}
@@ -26,7 +36,6 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
 .chart-title{font-size:16px;font-weight:700;color:#222}
 .chart-sub{font-size:10px;color:#888;margin-top:1px}
 .chart-area{flex:1;overflow:auto;background:#e8e8e8;display:flex;align-items:flex-start;justify-content:center;padding:10px}
-#sk{display:block}
 .drag-hint{font-size:10px;color:#aaa;padding:3px 14px;background:#fff;border-top:1px solid #f0f0f0;text-align:center;flex-shrink:0}
 .footer{background:#fff;border-top:1px solid #ddd;padding:6px 12px;flex-shrink:0}
 .footer-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
@@ -52,109 +61,223 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
 </head>
 <body>
 <div class="app">
-  <h1 class="app-title">GOURIKIコーポレーション BSサンキースタジオ</h1>
-  <div class="app-body">
-    <div class="sidebar">
-      <div class="sidebar-scroll">
-        <div class="sec-hdr" onclick="tog('s-basic','ic-basic')">基本情報 <span id="ic-basic">－</span></div>
-        <div class="sec-body" id="s-basic">
-          <div class="frow"><label>企業名:</label><input type="text" id="company" value="GOURIKI" oninput="draw()"></div>
-          <div class="frow"><label>決算期:</label><input type="text" id="period" value="2026年3月期" oninput="draw()"></div>
-          <div class="frow"><label>単位:</label>
-            <select id="unit" onchange="draw()">
-              <option value="1">円</option>
-              <option value="10000" selected>万円</option>
-              <option value="1000000">百万円</option>
-            </select>
-          </div>
-        </div>
-        <div class="sec-hdr" onclick="tog('s-asset','ic-asset')">資産の部 <span id="ic-asset">＋</span></div>
-        <div class="sec-body" id="s-asset" style="display:none">
-          <div class="sfield"><label>現金及び預金</label><input type="number" id="a1" value="27558" oninput="draw()"></div>
-          <div class="sfield"><label>売掛金</label><input type="number" id="a2" value="6634" oninput="draw()"></div>
-          <div class="sfield"><label>棚卸資産</label><input type="number" id="a3" value="14023" oninput="draw()"></div>
-          <div class="sfield"><label>その他流動資産</label><input type="number" id="a4" value="1275" oninput="draw()"></div>
-          <div class="sfield"><label>有形固定資産</label><input type="number" id="a5" value="20435" oninput="draw()"></div>
-          <div class="sfield"><label>無形固定資産</label><input type="number" id="a6" value="9738" oninput="draw()"></div>
-          <div class="sfield"><label>投資その他の資産</label><input type="number" id="a7" value="4965" oninput="draw()"></div>
-        </div>
-        <div class="sec-hdr" onclick="tog('s-liab','ic-liab')">負債の部 <span id="ic-liab">＋</span></div>
-        <div class="sec-body" id="s-liab" style="display:none">
-          <div class="sfield"><label>買掛金</label><input type="number" id="l1" value="4461" oninput="draw()"></div>
-          <div class="sfield"><label>短期借入金</label><input type="number" id="l2" value="10000" oninput="draw()"></div>
-          <div class="sfield"><label>その他流動負債</label><input type="number" id="l3" value="8632" oninput="draw()"></div>
-          <div class="sfield"><label>長期借入金</label><input type="number" id="l4" value="45989" oninput="draw()"></div>
-          <div class="sfield"><label>その他固定負債</label><input type="number" id="l5" value="222" oninput="draw()"></div>
-        </div>
-        <div class="sec-hdr" onclick="tog('s-eq','ic-eq')">純資産の部 <span id="ic-eq">＋</span></div>
-        <div class="sec-body" id="s-eq" style="display:none">
-          <div class="sfield"><label>資本金</label><input type="number" id="e1" value="8500" oninput="draw()"></div>
-          <div class="sfield"><label>資本剰余金</label><input type="number" id="e2" value="2055" oninput="draw()"></div>
-          <div class="sfield"><label>利益剰余金</label><input type="number" id="e3" value="5429" oninput="draw()"></div>
-          <div class="sfield"><label>自己株式</label><input type="number" id="e4" value="-660" oninput="draw()"></div>
-        </div>
-      </div>
-      <div class="sidebar-code">
-        <textarea class="code-box" id="code-input" placeholder="// コード入力&#10;// 例: 現金及び預金 [27557] 資産合計" oninput="parseCode()"></textarea>
-      </div>
-    </div>
+  <h1 class="app-title">GOURIKIコーポレーション サンキースタジオ</h1>
 
-    <div class="main">
-      <div class="chart-hdr">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
-            <div class="chart-title" id="hdr-title">株式会社GOURIKI ｜ XXXX</div>
-            <div class="chart-sub" id="hdr-sub">貸借対照表 2026年3月期（万円）｜ Balance Sheet</div>
-          </div>
-          <div id="bal-badge" class="bal-badge" style="background:#e8f5e9;color:#2e7d32">✓ 一致</div>
-        </div>
-      </div>
-      <div class="chart-area" id="chart-area">
-        <svg id="sk" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-      <div class="drag-hint">ノードをドラッグして移動 ／ ダブルクリックでリセット</div>
-    </div>
+  <!-- タブバー -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('bs')">📊 貸借対照表（BS）</button>
+    <button class="tab-btn" onclick="switchTab('pl')">📈 損益計算書（PL）</button>
   </div>
 
-  <div class="footer">
-    <div class="footer-row">
-      <div class="f-item">簡易版:<label class="toggle-wrap"><input type="checkbox" id="f-simple" onchange="draw()"><span class="toggle-slider"></span></label></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">テキスト:<label class="toggle-wrap"><input type="checkbox" id="f-text" checked onchange="draw()"><span class="toggle-slider"></span></label></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">フォントサイズ:<input type="range" class="f-slider" id="f-fontsize" min="7" max="14" value="10" step="0.5" oninput="draw()"></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">帯の太さ:<input type="range" class="f-slider" id="f-nw" min="6" max="40" value="18" step="1" oninput="draw()"></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">縦幅:<input type="range" class="f-slider" id="f-scale" min="0.3" max="3.0" value="1.0" step="0.05" oninput="draw()"></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">間隔:<input type="range" class="f-slider" id="f-pad" min="0" max="40" value="8" step="1" oninput="draw()"></div>
-    </div>
-    <div class="footer-row">
-      <div class="f-item">Size: W:<input type="number" class="f-num" id="svg-w" value="1000" min="200" max="3000" step="10" oninput="draw()"></div>
-      <div class="f-item">H:<input type="number" class="f-num" id="svg-h" value="480" min="200" max="2000" step="10" oninput="draw()"></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">Margins: L:<input type="number" class="f-num" id="mg-l" value="130" min="0" max="300" oninput="draw()"></div>
-      <div class="f-item">R:<input type="number" class="f-num" id="mg-r" value="130" min="0" max="300" oninput="draw()"></div>
-      <div class="f-item">T:<input type="number" class="f-num" id="mg-t" value="28" min="0" max="100" oninput="draw()"></div>
-      <div class="f-item">B:<input type="number" class="f-num" id="mg-b" value="18" min="0" max="100" oninput="draw()"></div>
-      <span class="f-sep">|</span>
-      <div class="f-item">BG:<input type="color" class="f-color" id="bg-color" value="#ffffff" oninput="draw()"></div>
-      <div class="f-chk"><input type="checkbox" id="bg-tr" onchange="draw()"><label for="bg-tr">透明</label></div>
-      <div style="margin-left:auto;display:flex;gap:5px">
-        <button class="fbtn" onclick="saveSVG()">⬇ 保存</button>
-        <button class="fbtn" onclick="resetAll()">↺ リセット</button>
+  <!-- ===== BS タブ ===== -->
+  <div class="tab-panel active" id="tab-bs">
+    <div class="app-body">
+      <div class="sidebar">
+        <div class="sidebar-scroll">
+          <div class="sec-hdr" onclick="tog('s-basic','ic-basic')">基本情報 <span id="ic-basic">－</span></div>
+          <div class="sec-body" id="s-basic">
+            <div class="frow"><label>企業名:</label><input type="text" id="company" value="GOURIKI" oninput="drawBS()"></div>
+            <div class="frow"><label>決算期:</label><input type="text" id="period" value="2026年3月期" oninput="drawBS()"></div>
+            <div class="frow"><label>単位:</label>
+              <select id="unit" onchange="drawBS()">
+                <option value="1">円</option>
+                <option value="10000" selected>万円</option>
+                <option value="1000000">百万円</option>
+              </select>
+            </div>
+            <div class="frow"><label>資産の部:</label><input type="text" id="lbl-asset" value="資産の部" oninput="drawBS()"></div>
+            <div class="frow"><label>負債の部:</label><input type="text" id="lbl-liab" value="負債の部" oninput="drawBS()"></div>
+            <div class="frow"><label>純資産の部:</label><input type="text" id="lbl-eq" value="純資産の部" oninput="drawBS()"></div>
+          </div>
+          <div class="sec-hdr" onclick="tog('s-asset','ic-asset')">資産の部 <span id="ic-asset">＋</span></div>
+          <div class="sec-body" id="s-asset" style="display:none">
+            <div class="sfield"><label>現金及び預金</label><input type="number" id="a1" value="27558" oninput="drawBS()"></div>
+            <div class="sfield"><label>売掛金</label><input type="number" id="a2" value="6634" oninput="drawBS()"></div>
+            <div class="sfield"><label>棚卸資産</label><input type="number" id="a3" value="14023" oninput="drawBS()"></div>
+            <div class="sfield"><label>その他流動資産</label><input type="number" id="a4" value="1275" oninput="drawBS()"></div>
+            <div class="sfield"><label>有形固定資産</label><input type="number" id="a5" value="20435" oninput="drawBS()"></div>
+            <div class="sfield"><label>無形固定資産</label><input type="number" id="a6" value="9738" oninput="drawBS()"></div>
+            <div class="sfield"><label>投資その他の資産</label><input type="number" id="a7" value="4965" oninput="drawBS()"></div>
+          </div>
+          <div class="sec-hdr" onclick="tog('s-liab','ic-liab')">負債の部 <span id="ic-liab">＋</span></div>
+          <div class="sec-body" id="s-liab" style="display:none">
+            <div class="sfield"><label>買掛金</label><input type="number" id="l1" value="4461" oninput="drawBS()"></div>
+            <div class="sfield"><label>短期借入金</label><input type="number" id="l2" value="10000" oninput="drawBS()"></div>
+            <div class="sfield"><label>その他流動負債</label><input type="number" id="l3" value="8632" oninput="drawBS()"></div>
+            <div class="sfield"><label>長期借入金</label><input type="number" id="l4" value="45989" oninput="drawBS()"></div>
+            <div class="sfield"><label>その他固定負債</label><input type="number" id="l5" value="222" oninput="drawBS()"></div>
+          </div>
+          <div class="sec-hdr" onclick="tog('s-eq','ic-eq')">純資産の部 <span id="ic-eq">＋</span></div>
+          <div class="sec-body" id="s-eq" style="display:none">
+            <div class="sfield"><label>資本金</label><input type="number" id="e1" value="8500" oninput="drawBS()"></div>
+            <div class="sfield"><label>資本剰余金</label><input type="number" id="e2" value="2055" oninput="drawBS()"></div>
+            <div class="sfield"><label>利益剰余金</label><input type="number" id="e3" value="5429" oninput="drawBS()"></div>
+            <div class="sfield"><label>自己株式</label><input type="number" id="e4" value="-660" oninput="drawBS()"></div>
+          </div>
+        </div>
+        <div class="sidebar-code">
+          <textarea class="code-box" id="code-input" placeholder="// コード入力&#10;// 例: 現金及び預金 [27557] 資産合計" oninput="parseCode()"></textarea>
+        </div>
+      </div>
+      <div class="main">
+        <div class="chart-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div class="chart-title" id="hdr-title">株式会社GOURIKI ｜ 貸借対照表</div>
+              <div class="chart-sub" id="hdr-sub">2026年3月期（万円）｜ Balance Sheet</div>
+            </div>
+            <div id="bal-badge" class="bal-badge" style="background:#e8f5e9;color:#2e7d32">✓ 一致</div>
+          </div>
+        </div>
+        <div class="chart-area" id="chart-area-bs">
+          <svg id="sk-bs" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="drag-hint">ノードをドラッグして自由移動 ／ ダブルクリックでリセット</div>
       </div>
     </div>
-  </div>
-</div>
+    <div class="footer">
+      <div class="footer-row">
+        <div class="f-item">簡易版:<label class="toggle-wrap"><input type="checkbox" id="f-simple" onchange="drawBS()"><span class="toggle-slider"></span></label></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">テキスト:<label class="toggle-wrap"><input type="checkbox" id="f-text" checked onchange="drawBS()"><span class="toggle-slider"></span></label></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">フォントサイズ:<input type="range" class="f-slider" id="f-fontsize" min="7" max="14" value="10" step="0.5" oninput="drawBS()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">帯の太さ:<input type="range" class="f-slider" id="f-nw" min="6" max="40" value="18" step="1" oninput="drawBS()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">縦幅:<input type="range" class="f-slider" id="f-scale" min="0.3" max="3.0" value="1.0" step="0.05" oninput="drawBS()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">間隔:<input type="range" class="f-slider" id="f-pad" min="0" max="40" value="8" step="1" oninput="drawBS()"></div>
+      </div>
+      <div class="footer-row">
+        <div class="f-item">Size: W:<input type="number" class="f-num" id="svg-w" value="1000" min="200" max="3000" step="10" oninput="drawBS()"></div>
+        <div class="f-item">H:<input type="number" class="f-num" id="svg-h" value="480" min="200" max="2000" step="10" oninput="drawBS()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">Margins: L:<input type="number" class="f-num" id="mg-l" value="130" min="0" max="300" oninput="drawBS()"></div>
+        <div class="f-item">R:<input type="number" class="f-num" id="mg-r" value="130" min="0" max="300" oninput="drawBS()"></div>
+        <div class="f-item">T:<input type="number" class="f-num" id="mg-t" value="28" min="0" max="100" oninput="drawBS()"></div>
+        <div class="f-item">B:<input type="number" class="f-num" id="mg-b" value="18" min="0" max="100" oninput="drawBS()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">BG:<input type="color" class="f-color" id="bg-color" value="#ffffff" oninput="drawBS()"></div>
+        <div class="f-chk"><input type="checkbox" id="bg-tr" onchange="drawBS()"><label for="bg-tr">透明</label></div>
+        <div style="margin-left:auto;display:flex;gap:5px">
+          <button class="fbtn" onclick="saveSVG('sk-bs','bs_sankey.svg')">⬇ 保存</button>
+          <button class="fbtn" onclick="resetBS()">↺ リセット</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-bs -->
+
+  <!-- ===== PL タブ ===== -->
+  <div class="tab-panel" id="tab-pl">
+    <div class="app-body">
+      <div class="sidebar">
+        <div class="sidebar-scroll">
+          <div class="sec-hdr" onclick="tog('sp-basic','icp-basic')">基本情報 <span id="icp-basic">－</span></div>
+          <div class="sec-body" id="sp-basic">
+            <div class="frow"><label>企業名:</label><input type="text" id="pl-company" value="GOURIKI" oninput="drawPL()"></div>
+            <div class="frow"><label>決算期:</label><input type="text" id="pl-period" value="令和8年3月期" oninput="drawPL()"></div>
+            <div class="frow"><label>単位:</label>
+              <select id="pl-unit" onchange="drawPL()">
+                <option value="1" selected>円</option>
+                <option value="10000">万円</option>
+                <option value="1000000">百万円</option>
+              </select>
+            </div>
+          </div>
+          <div class="sec-hdr" onclick="tog('sp-rev','icp-rev')">売上 <span id="icp-rev">＋</span></div>
+          <div class="sec-body" id="sp-rev" style="display:none">
+            <div class="sfield"><label>完成工事高</label><input type="number" id="p-r1" value="657242327" oninput="drawPL()"></div>
+            <div class="sfield"><label>売上高</label><input type="number" id="p-r2" value="49223973" oninput="drawPL()"></div>
+            <div class="sfield"><label>卸売売上</label><input type="number" id="p-r3" value="386376" oninput="drawPL()"></div>
+            <div class="sfield"><label>受取駐車料</label><input type="number" id="p-r4" value="11104282" oninput="drawPL()"></div>
+            <div class="sfield"><label>受取ライセンス料</label><input type="number" id="p-r5" value="8816614" oninput="drawPL()"></div>
+          </div>
+          <div class="sec-hdr" onclick="tog('sp-cogs','icp-cogs')">売上原価 <span id="icp-cogs">＋</span></div>
+          <div class="sec-body" id="sp-cogs" style="display:none">
+            <div class="sfield"><label>当期製品製造原価</label><input type="number" id="p-c1" value="419155474" oninput="drawPL()"></div>
+            <div class="sfield"><label>期末商品棚卸高△</label><input type="number" id="p-c2" value="13866400" oninput="drawPL()"></div>
+          </div>
+          <div class="sec-hdr" onclick="tog('sp-sga','icp-sga')">販管費 <span id="icp-sga">＋</span></div>
+          <div class="sec-body" id="sp-sga" style="display:none">
+            <div class="sfield"><label>給料手当</label><input type="number" id="p-s1" value="74138085" oninput="drawPL()"></div>
+            <div class="sfield"><label>支払報酬</label><input type="number" id="p-s2" value="18038356" oninput="drawPL()"></div>
+            <div class="sfield"><label>支払手数料</label><input type="number" id="p-s3" value="35300430" oninput="drawPL()"></div>
+            <div class="sfield"><label>地代家賃</label><input type="number" id="p-s4" value="49282249" oninput="drawPL()"></div>
+            <div class="sfield"><label>減価償却費</label><input type="number" id="p-s5" value="54098434" oninput="drawPL()"></div>
+            <div class="sfield"><label>法定福利費</label><input type="number" id="p-s6" value="15411969" oninput="drawPL()"></div>
+            <div class="sfield"><label>役員報酬</label><input type="number" id="p-s7" value="9999996" oninput="drawPL()"></div>
+            <div class="sfield"><label>保険料</label><input type="number" id="p-s8" value="9343721" oninput="drawPL()"></div>
+            <div class="sfield"><label>その他販管費</label><input type="number" id="p-s9" value="42403868" oninput="drawPL()"></div>
+          </div>
+          <div class="sec-hdr" onclick="tog('sp-other','icp-other')">営業外・特別損益 <span id="icp-other">＋</span></div>
+          <div class="sec-body" id="sp-other" style="display:none">
+            <div class="sfield"><label>営業外収益</label><input type="number" id="p-oi" value="30374351" oninput="drawPL()"></div>
+            <div class="sfield"><label>営業外費用</label><input type="number" id="p-oe" value="8461190" oninput="drawPL()"></div>
+            <div class="sfield"><label>特別利益</label><input type="number" id="p-si" value="39672859" oninput="drawPL()"></div>
+            <div class="sfield"><label>特別損失</label><input type="number" id="p-se" value="70123" oninput="drawPL()"></div>
+            <div class="sfield"><label>法人税等</label><input type="number" id="p-tax" value="15660066" oninput="drawPL()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="main">
+        <div class="chart-hdr">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div class="chart-title" id="pl-hdr-title">株式会社GOURIKI ｜ 損益計算書</div>
+              <div class="chart-sub" id="pl-hdr-sub">令和8年3月期（円）｜ Profit & Loss Statement</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-area" id="chart-area-pl">
+          <svg id="sk-pl" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="drag-hint">ノードをドラッグして自由移動 ／ ダブルクリックでリセット</div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-row">
+        <div class="f-item">テキスト:<label class="toggle-wrap"><input type="checkbox" id="pf-text" checked onchange="drawPL()"><span class="toggle-slider"></span></label></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">フォントサイズ:<input type="range" class="f-slider" id="pf-fontsize" min="7" max="14" value="10" step="0.5" oninput="drawPL()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">帯の太さ:<input type="range" class="f-slider" id="pf-nw" min="6" max="50" value="22" step="1" oninput="drawPL()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">縦幅:<input type="range" class="f-slider" id="pf-scale" min="0.3" max="3.0" value="1.0" step="0.05" oninput="drawPL()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">間隔:<input type="range" class="f-slider" id="pf-pad" min="0" max="40" value="6" step="1" oninput="drawPL()"></div>
+      </div>
+      <div class="footer-row">
+        <div class="f-item">Size: W:<input type="number" class="f-num" id="psv-w" value="1100" min="200" max="3000" step="10" oninput="drawPL()"></div>
+        <div class="f-item">H:<input type="number" class="f-num" id="psv-h" value="560" min="200" max="2000" step="10" oninput="drawPL()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">Margins: L:<input type="number" class="f-num" id="pmg-l" value="140" min="0" max="300" oninput="drawPL()"></div>
+        <div class="f-item">R:<input type="number" class="f-num" id="pmg-r" value="140" min="0" max="300" oninput="drawPL()"></div>
+        <div class="f-item">T:<input type="number" class="f-num" id="pmg-t" value="30" min="0" max="100" oninput="drawPL()"></div>
+        <div class="f-item">B:<input type="number" class="f-num" id="pmg-b" value="18" min="0" max="100" oninput="drawPL()"></div>
+        <span class="f-sep">|</span>
+        <div class="f-item">BG:<input type="color" class="f-color" id="pbg-color" value="#ffffff" oninput="drawPL()"></div>
+        <div class="f-chk"><input type="checkbox" id="pbg-tr" onchange="drawPL()"><label for="pbg-tr">透明</label></div>
+        <div style="margin-left:auto;display:flex;gap:5px">
+          <button class="fbtn" onclick="saveSVG('sk-pl','pl_sankey.svg')">⬇ 保存</button>
+          <button class="fbtn" onclick="resetPL()">↺ リセット</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-pl -->
+
+</div><!-- /app -->
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script>
-const DEFAULTS={a1:27558,a2:6634,a3:14023,a4:1275,a5:20435,a6:9738,a7:4965,l1:4461,l2:10000,l3:8632,l4:45989,l5:222,e1:8500,e2:2055,e3:5429,e4:-660};
-const FIELD_MAP={'現金及び預金':'a1','売掛金':'a2','棚卸資産':'a3','その他流動資産':'a4','有形固定資産':'a5','無形固定資産':'a6','投資その他の資産':'a7','投資その他':'a7','買掛金':'l1','短期借入金':'l2','その他流動負債':'l3','長期借入金':'l4','その他固定負債':'l5','資本金':'e1','資本剰余金':'e2','利益剰余金':'e3','自己株式':'e4'};
-let nodeOffsets={};
+// ===== タブ切り替え =====
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{b.classList.toggle('active',['bs','pl'][i]===t);});
+  document.querySelectorAll('.tab-panel').forEach(p=>{p.classList.toggle('active',p.id==='tab-'+t);});
+  if(t==='bs') drawBS(); else drawPL();
+}
 
+// ===== 共通ユーティリティ =====
 function tog(id,icId){
   const el=document.getElementById(id),ic=document.getElementById(icId);
   if(!el||!ic) return;
@@ -162,19 +285,49 @@ function tog(id,icId){
   el.style.display=open?'none':'flex';
   ic.textContent=open?'＋':'－';
 }
-function resetAll(){
-  Object.entries(DEFAULTS).forEach(([k,v])=>{const e=document.getElementById(k);if(e)e.value=v;});
-  document.getElementById('code-input').value='';
-  document.getElementById('f-scale').value=1.0;
-  document.getElementById('f-pad').value=8;
-  nodeOffsets={};draw();
-}
 function gv(id){return parseFloat(document.getElementById(id).value)||0;}
 function pct(v,t){return t?Math.round(v/t*1000)/10:0;}
 function fmtVal(raw,unit){
   const v=raw/unit;
   return(Math.abs(v-Math.round(v))<0.05)?Math.round(v).toLocaleString():v.toFixed(1);
 }
+function saveSVG(svgId,fname){
+  const svg=document.getElementById(svgId);
+  const blob=new Blob([svg.outerHTML],{type:'image/svg+xml'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+}
+
+// ===== ノードオフセット（BS/PL 独立） =====
+let bsNodeOff={},bsNodeXOff={};
+let plNodeOff={},plNodeXOff={};
+
+// ===== BS リセット =====
+const BS_DEF={a1:27558,a2:6634,a3:14023,a4:1275,a5:20435,a6:9738,a7:4965,l1:4461,l2:10000,l3:8632,l4:45989,l5:222,e1:8500,e2:2055,e3:5429,e4:-660};
+function resetBS(){
+  Object.entries(BS_DEF).forEach(([k,v])=>{const e=document.getElementById(k);if(e)e.value=v;});
+  document.getElementById('code-input').value='';
+  document.getElementById('f-scale').value=1.0;
+  document.getElementById('f-pad').value=8;
+  bsNodeOff={};bsNodeXOff={};drawBS();
+}
+
+// ===== PL リセット =====
+const PL_DEF={
+  'p-r1':657242327,'p-r2':49223973,'p-r3':386376,'p-r4':11104282,'p-r5':8816614,
+  'p-c1':419155474,'p-c2':13866400,
+  'p-s1':74138085,'p-s2':18038356,'p-s3':35300430,'p-s4':49282249,'p-s5':54098434,
+  'p-s6':15411969,'p-s7':9999996,'p-s8':9343721,'p-s9':42403868,
+  'p-oi':30374351,'p-oe':8461190,'p-si':39672859,'p-se':70123,'p-tax':15660066
+};
+function resetPL(){
+  Object.entries(PL_DEF).forEach(([k,v])=>{const e=document.getElementById(k);if(e)e.value=v;});
+  document.getElementById('pf-scale').value=1.0;
+  document.getElementById('pf-pad').value=6;
+  plNodeOff={};plNodeXOff={};drawPL();
+}
+
+// ===== BS コード入力 =====
+const FIELD_MAP={'現金及び預金':'a1','売掛金':'a2','棚卸資産':'a3','その他流動資産':'a4','有形固定資産':'a5','無形固定資産':'a6','投資その他の資産':'a7','投資その他':'a7','買掛金':'l1','短期借入金':'l2','その他流動負債':'l3','長期借入金':'l4','その他固定負債':'l5','資本金':'e1','資本剰余金':'e2','利益剰余金':'e3','自己株式':'e4'};
 function parseCode(){
   const lines=document.getElementById('code-input').value.split('\n');
   const totals={};
@@ -191,14 +344,42 @@ function parseCode(){
     const fid=FIELD_MAP[name];
     if(fid){const el=document.getElementById(fid);if(el)el.value=Math.round(val);}
   });
-  draw();
+  drawBS();
 }
 
-function draw(){
+// ===== ドラッグユーティリティ =====
+function makeDraggable(g,n,nodeOff,nodeXOff,onDrag){
+  let dy0=0,dx0=0,off0=0,offX0=0;
+  g.call(d3.drag()
+    .on('start',function(e){dy0=e.y;dx0=e.x;off0=nodeOff[n.id]||0;offX0=nodeXOff[n.id]||0;g.select('rect').attr('opacity',0.75);})
+    .on('drag',function(e){
+      nodeOff[n.id]=off0+(e.y-dy0);nodeXOff[n.id]=offX0+(e.x-dx0);
+      n.y=n.baseY+(nodeOff[n.id]||0);n.x=n.baseX+(nodeXOff[n.id]||0);
+      g.select('rect').attr('y',n.y).attr('x',n.x);onDrag();
+    })
+    .on('end',function(){g.select('rect').attr('opacity',1);})
+  );
+  g.on('dblclick',function(){nodeOff[n.id]=0;nodeXOff[n.id]=0;n.y=n.baseY;n.x=n.baseX;g.select('rect').attr('y',n.y).attr('x',n.x);onDrag();});
+}
+
+function mkTxt(g,x,y,str,size,col,anchor,weight){
+  g.append('text').attr('x',x).attr('y',y).attr('font-size',size).attr('fill',col)
+    .attr('text-anchor',anchor||'middle').attr('font-weight',weight||'400')
+    .attr('font-family','sans-serif').text(str);
+}
+function buildPath(ax,ay,bx,by,h){
+  const cx=(ax+bx)/2;
+  return `M${ax},${ay} C${cx},${ay} ${cx},${by} ${bx},${by} L${bx},${by+h} C${cx},${by+h} ${cx},${ay+h} ${ax},${ay+h} Z`;
+}
+
+// ========================================
+// ===== BS サンキー描画 =================
+// ========================================
+function drawBS(){
   const unit=+document.getElementById('unit').value;
   const uLabel=unit===1?'円':unit===10000?'万円':'百万円';
-  document.getElementById('hdr-title').textContent='株式会社'+(document.getElementById('company').value||'企業名')+' ｜ XXXX';
-  document.getElementById('hdr-sub').textContent='貸借対照表 '+(document.getElementById('period').value||'')+'（'+uLabel+'）｜ Balance Sheet';
+  document.getElementById('hdr-title').textContent='株式会社'+(document.getElementById('company').value||'企業名')+' ｜ 貸借対照表';
+  document.getElementById('hdr-sub').textContent=(document.getElementById('period').value||'')+'（'+uLabel+'）｜ Balance Sheet';
 
   const simple=document.getElementById('f-simple').checked;
   const showText=document.getElementById('f-text').checked;
@@ -230,16 +411,14 @@ function draw(){
   bb.style.background=Math.abs(diff)<1?'#e8f5e9':'#fff3e0';
   bb.style.color=Math.abs(diff)<1?'#2e7d32':'#e65100';
 
-  const svgEl=document.getElementById('sk');
+  const svgEl=document.getElementById('sk-bs');
   svgEl.setAttribute('width',SVG_W);svgEl.setAttribute('height',SVG_H);svgEl.innerHTML='';
-
   const innerH=SVG_H-MT-MB;
   const scale=(innerH/Math.max(tA,tLE,1))*scaleMulti;
   const usableW=SVG_W-ML-MR;
   const cols=simple?4:6;
   const colW=usableW/cols;
   const x1=ML,x2=ML+colW,x3=ML+colW*2,x4=ML+colW*3,x5=ML+colW*4,x6=ML+colW*5;
-
   const svg=d3.select(svgEl);
   if(!bgTransparent) svg.append('rect').attr('width',SVG_W).attr('height',SVG_H).attr('fill',bgColor);
 
@@ -247,7 +426,7 @@ function draw(){
     const bars=items.filter(n=>n.val>0);
     const totalH=bars.reduce((s,n)=>s+n.val*scale,0)+(bars.length-1)*PAD;
     let y=MT+(innerH-totalH)/2;
-    bars.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=y;n.x=xPos;n.y=y+(nodeOffsets[n.id]||0);y+=n.h+PAD;});
+    bars.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=y;n.baseX=xPos;n.x=xPos+(bsNodeXOff[n.id]||0);n.y=y+(bsNodeOff[n.id]||0);y+=n.h+PAD;});
     return bars;
   }
 
@@ -279,10 +458,10 @@ function draw(){
 
   const lf2=lf.filter(n=>n.val>0);
   const ml2=simple?[{id:'資産合計',val:tA,col:'#555',pct:100}]:ml.filter(n=>n.val>0);
-  mc.h=Math.max(2,mc.val*scale);mc.baseY=MT+(innerH-mc.h)/2;mc.x=x3;mc.y=mc.baseY+(nodeOffsets[mc.id]||0);
+  mc.h=Math.max(2,mc.val*scale);mc.baseY=MT+(innerH-mc.h)/2;mc.baseX=x3;mc.x=x3+(bsNodeXOff[mc.id]||0);mc.y=mc.baseY+(bsNodeOff[mc.id]||0);
   const rh2=mc2.val*scale+mc3.val*scale+PAD;
-  mc2.h=Math.max(2,mc2.val*scale);mc2.baseY=MT+(innerH-rh2)/2;mc2.x=x4;mc2.y=mc2.baseY+(nodeOffsets[mc2.id]||0);
-  mc3.h=Math.max(2,mc3.val*scale);mc3.baseY=mc2.baseY+mc2.h+PAD;mc3.x=x4;mc3.y=mc3.baseY+(nodeOffsets[mc3.id]||0);
+  mc2.h=Math.max(2,mc2.val*scale);mc2.baseY=MT+(innerH-rh2)/2;mc2.baseX=x4;mc2.x=x4+(bsNodeXOff[mc2.id]||0);mc2.y=mc2.baseY+(bsNodeOff[mc2.id]||0);
+  mc3.h=Math.max(2,mc3.val*scale);mc3.baseY=mc2.baseY+mc2.h+PAD;mc3.baseX=x4;mc3.x=x4+(bsNodeXOff[mc3.id]||0);mc3.y=mc3.baseY+(bsNodeOff[mc3.id]||0);
   const mr2=simple?[]:mr.filter(n=>n.val>0);
   const lr2=simple?[]:lr.filter(n=>n.val>0);
 
@@ -295,7 +474,7 @@ function draw(){
   if(lr_all.length){
     const totalH=lr_all.reduce((s,n)=>s+n.val*scale,0)+(lr_all.length-1)*PAD;
     let y=MT+(innerH-totalH)/2;
-    lr_all.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=y;n.x=x6;n.y=y+(nodeOffsets[n.id]||0);y+=n.h+PAD;});
+    lr_all.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=y;n.baseX=x6;n.x=x6+(bsNodeXOff[n.id]||0);n.y=y+(bsNodeOff[n.id]||0);y+=n.h+PAD;});
   }
 
   const allNodes=[...lf2,...ml2,mc,mc2,mc3,...mr2,...lr_all];
@@ -303,12 +482,6 @@ function draw(){
   allNodes.forEach(n=>{sOff[n.id]=0;tOff[n.id]=0;});
 
   const flowsG=svg.append('g'),nodesG=svg.append('g'),labelsG=svg.append('g');
-
-  function buildPath(ax,ay,bx,by,h){
-    const cx=(ax+bx)/2;
-    return `M${ax},${ay} C${cx},${ay} ${cx},${by} ${bx},${by} L${bx},${by+h} C${cx},${by+h} ${cx},${ay+h} ${ax},${ay+h} Z`;
-  }
-
   const flowDefs=[];
   function addFlow(s,t,ov){
     if(!s||!s.h||!t||!t.h) return;
@@ -331,24 +504,20 @@ function draw(){
     lr_eq.forEach(n=>addFlow(mc3,n,n.val));
   }
 
-  function renderFlows(){
+  function renderFlowsBS(){
     flowsG.selectAll('path').remove();
     flowDefs.forEach(f=>{
       const s=allNodes.find(n=>n.id===f.sId),t=allNodes.find(n=>n.id===f.tId);
       if(!s||!t) return;
-      flowsG.append('path').attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh)).attr('fill',f.col).attr('opacity',0.5);
+      flowsG.append('path').attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh)).attr('fill',f.col).attr('opacity',0.4);
     });
   }
-
-  function mkTxt(g,x,y,str,size,col,anchor,weight){
-    g.append('text').attr('x',x).attr('y',y).attr('font-size',size).attr('fill',col)
-      .attr('text-anchor',anchor||'middle').attr('font-weight',weight||'400')
-      .attr('font-family','sans-serif').text(str);
-  }
-
-  function renderLabels(){
+  function renderLabelsBS(){
     labelsG.selectAll('*').remove();
     if(!showText) return;
+    const lblAsset=document.getElementById('lbl-asset').value||'資産の部';
+    const lblLiab=document.getElementById('lbl-liab').value||'負債の部';
+    const lblEq=document.getElementById('lbl-eq').value||'純資産の部';
     allNodes.filter(n=>n.h>0).forEach(n=>{
       const isMid=n.id==='資産'||n.id==='負債'||n.id==='純資産';
       const isLeft=n.x<SVG_W/2-50;
@@ -358,9 +527,9 @@ function draw(){
       const anc=isLeft?'end':'start';
       if(isMid){
         if(n.h>=14){
-          mkTxt(labelsG,n.x+NW/2,cy-4,n.pct.toFixed(1)+'%',fs,'#fff','middle');
-          mkTxt(labelsG,n.x+NW/2,cy+5,n.id,fs+1,'#fff','middle','700');
-          mkTxt(labelsG,n.x+NW/2,cy+fs+6,dv,fs-1,'rgba(255,255,255,0.85)','middle');
+          mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',fs,n.col,'middle','700');
+          mkTxt(labelsG,n.x+NW/2,cy-3,n.id,fs+1,'#fff','middle','700');
+          mkTxt(labelsG,n.x+NW/2,cy+fs+2,dv,fs-1,'rgba(255,255,255,0.85)','middle');
         }
         return;
       }
@@ -370,52 +539,321 @@ function draw(){
       const lineH=fs*1.4;
       const showPct=n.pct>=1;
       if(showPct){
-        const blockH=lineH*2;
-        const startY=cy-blockH/2;
-        mkTxt(labelsG,tx,startY,n.pct.toFixed(1)+'%',valSize,'#e74c3c',anc,'400');
-        mkTxt(labelsG,tx,startY+lineH,n.id,nameSize,'#222',anc,isMidNode?'700':'500');
-        mkTxt(labelsG,tx,startY+lineH*2,dv,valSize,'#777',anc,'400');
-      } else {
-        const blockH=lineH;
-        const startY=cy-blockH/2;
-        mkTxt(labelsG,tx,startY,n.id,nameSize,'#222',anc,isMidNode?'700':'500');
+        mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',valSize,n.col,'middle','700');
+        const startY=cy-lineH;
+        mkTxt(labelsG,tx,startY,n.id,nameSize,n.col,anc,isMidNode?'700':'500');
         mkTxt(labelsG,tx,startY+lineH,dv,valSize,'#777',anc,'400');
+      } else {
+        mkTxt(labelsG,tx,cy-lineH/2,n.id,nameSize,n.col,anc,isMidNode?'700':'500');
+        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400');
       }
     });
-    mkTxt(labelsG,ML,MT-8,'資産の部',fs,'#999','start');
-    mkTxt(labelsG,SVG_W-MR,MT-8,'負債・純資産の部',fs,'#999','end');
-    mkTxt(labelsG,SVG_W/2,SVG_H-4,'created with BSサンキースタジオ',8,'#ccc','middle');
+    mkTxt(labelsG,ML,MT-8,lblAsset,fs,'#999','start');
+    mkTxt(labelsG,SVG_W-MR,MT-8,lblLiab+' / '+lblEq,fs,'#999','end');
+    mkTxt(labelsG,SVG_W/2,SVG_H-4,'created with サンキースタジオ',8,'#ccc','middle');
   }
-
-  function renderNodes(){
+  function renderNodesBS(){
     nodesG.selectAll('g.ng').remove();
     allNodes.filter(n=>n.h>0).forEach(n=>{
       const g=nodesG.append('g').attr('class','ng');
-      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h)
-        .attr('rx',1).attr('fill',n.col).style('cursor','grab');
-      let dy0=0,off0=0;
-      g.call(d3.drag()
-        .on('start',function(e){dy0=e.y;off0=nodeOffsets[n.id]||0;g.select('rect').attr('opacity',0.75);})
-        .on('drag',function(e){
-          nodeOffsets[n.id]=off0+(e.y-dy0);n.y=n.baseY+(nodeOffsets[n.id]||0);
-          g.select('rect').attr('y',n.y);renderFlows();renderLabels();
-        })
-        .on('end',function(){g.select('rect').attr('opacity',1);})
-      );
-      g.on('dblclick',function(){nodeOffsets[n.id]=0;n.y=n.baseY;g.select('rect').attr('y',n.y);renderFlows();renderLabels();});
+      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h).attr('rx',1).attr('fill',n.col).style('cursor','grab');
+      makeDraggable(g,n,bsNodeOff,bsNodeXOff,()=>{renderFlowsBS();renderLabelsBS();});
+    });
+  }
+  renderFlowsBS();renderNodesBS();renderLabelsBS();
+}
+
+// ========================================
+// ===== PL サンキー描画（BS風）==========
+// ========================================
+function drawPL(){
+  const unit=+document.getElementById('pl-unit').value;
+  const uLabel=unit===1?'円':unit===10000?'万円':'百万円';
+  document.getElementById('pl-hdr-title').textContent='株式会社'+(document.getElementById('pl-company').value||'企業名')+' ｜ 損益計算書';
+  document.getElementById('pl-hdr-sub').textContent=(document.getElementById('pl-period').value||'')+'（'+uLabel+'）｜ Profit & Loss Statement';
+
+  const showText=document.getElementById('pf-text').checked;
+  const fs=parseFloat(document.getElementById('pf-fontsize').value);
+  const NW=parseInt(document.getElementById('pf-nw').value);
+  const scaleMulti=parseFloat(document.getElementById('pf-scale').value);
+  const PAD=parseInt(document.getElementById('pf-pad').value);
+  const SVG_W=Math.max(200,parseInt(document.getElementById('psv-w').value)||1100);
+  const SVG_H=Math.max(200,parseInt(document.getElementById('psv-h').value)||560);
+  const bgTransparent=document.getElementById('pbg-tr').checked;
+  const bgColor=document.getElementById('pbg-color').value;
+  const ML=parseInt(document.getElementById('pmg-l').value)||140;
+  const MR=parseInt(document.getElementById('pmg-r').value)||140;
+  const MT=parseInt(document.getElementById('pmg-t').value)||30;
+  const MB=parseInt(document.getElementById('pmg-b').value)||18;
+
+  // 値取得
+  const r1=gv('p-r1'),r2=gv('p-r2'),r3=gv('p-r3'),r4=gv('p-r4'),r5=gv('p-r5');
+  const tRev=r1+r2+r3+r4+r5;
+  const c1=gv('p-c1'),c2=gv('p-c2');
+  const tCogs=Math.max(0,c1-c2);
+  const grossProfit=Math.max(0,tRev-tCogs);
+  const s1=gv('p-s1'),s2=gv('p-s2'),s3=gv('p-s3'),s4=gv('p-s4'),s5=gv('p-s5');
+  const s6=gv('p-s6'),s7=gv('p-s7'),s8=gv('p-s8'),s9=gv('p-s9');
+  const tSGA=s1+s2+s3+s4+s5+s6+s7+s8+s9;
+  const opProfit=grossProfit-tSGA;
+  const oi=gv('p-oi'),oe=gv('p-oe');
+  const ordProfit=opProfit+oi-oe;
+  const si=gv('p-si'),se=gv('p-se');
+  const preProfit=ordProfit+si-se;
+  const tax=gv('p-tax');
+  const netProfit=preProfit-tax;
+
+  const svgEl=document.getElementById('sk-pl');
+  svgEl.setAttribute('width',SVG_W);svgEl.setAttribute('height',SVG_H);svgEl.innerHTML='';
+  const innerH=SVG_H-MT-MB;
+  const scale=(innerH/Math.max(tRev,1))*scaleMulti;
+
+  // BSと同じ6列構成
+  // x1=売上明細, x2=売上高(中央左), x3=売上原価/粗利(中央右), x4=販管費/営業利益, x5=経常・特別, x6=税・純利益
+  const usableW=SVG_W-ML-MR;
+  const cols=8;
+  const colW=usableW/cols;
+  const x1=ML, x2=ML+colW, x3=ML+colW*2, x4=ML+colW*3, x5=ML+colW*4, x6=ML+colW*5;
+  const x7=ML+colW*6, x8=ML+colW*7;
+
+  const svg=d3.select(svgEl);
+  if(!bgTransparent) svg.append('rect').attr('width',SVG_W).attr('height',SVG_H).attr('fill',bgColor);
+
+  // BSのlayoutGroupと同じ関数
+  function layoutGroup(items,xPos){
+    const bars=items.filter(n=>n.val>0);
+    const totalH=bars.reduce((s,n)=>s+Math.max(2,n.val*scale),0)+(bars.length-1)*PAD;
+    let y=MT+(innerH-totalH)/2;
+    bars.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=y;n.baseX=xPos;n.x=xPos+(plNodeXOff[n.id]||0);n.y=y+(plNodeOff[n.id]||0);y+=n.h+PAD;});
+    return bars;
+  }
+  function placeAt(n,xPos,baseY){
+    n.h=Math.max(2,n.val*scale);n.baseY=baseY;n.baseX=xPos;
+    n.x=xPos+(plNodeXOff[n.id]||0);n.y=baseY+(plNodeOff[n.id]||0);
+  }
+  function mk(id,val,col){return{id,val:Math.max(0,val),col,pct:pct(Math.max(0,val),tRev),h:0,baseY:0,baseX:0,x:0,y:0};}
+
+  // ---- 色：BSに倣いグレー→赤→緑の系統 ----
+  // 売上明細：グレー系（BS資産明細と同じ感覚）
+  const revCol='#555';
+  // 売上高（中央左）：濃いグレー（BS資産合計と同じ）
+  const revMidCol='#333';
+  // 売上原価：赤系（BS負債と同じ）
+  const cogsCol='#e74c3c';
+  const cogsSubCol='#c0392b';
+  // 売上総利益→営業利益：緑系（BS純資産と同じ）
+  const grossCol='#27ae60';
+  const opCol='#1e8449';
+  // 販管費：オレンジ系
+  const sgaCol='#e67e22';
+  const sgaSubCol='#d35400';
+  // 営業外費用：薄赤
+  const oeCol='#e57373';
+  // 営業外収益・特別利益：緑
+  const oiCol='#52be80';
+  const siCol='#27ae60';
+  const seCol='#e74c3c';
+  // 経常利益
+  const ordCol='#2ecc71';
+  // 税前
+  const preCol='#16a085';
+  // 法人税
+  const taxCol='#95a5a6';
+  // 当期純利益
+  const netCol='#27ae60';
+
+  // ---- ノード定義 ----
+  const nR1=mk('完成工事高',r1,revCol);
+  const nR2=mk('売上高(単)',r2,revCol);
+  const nR3=mk('卸売売上',r3,'#888');
+  const nR4=mk('受取駐車料',r4,'#888');
+  const nR5=mk('ライセンス料',r5,'#888');
+  const revItems=[nR1,nR2,nR3,nR4,nR5];
+
+  // 中央左：売上高（BSの「資産」に相当）
+  const nRev=mk('売上高',tRev,revMidCol);
+
+  // 中央右：売上原価＋売上総利益（BSの「負債＋純資産」に相当）
+  const nCogs=mk('売上原価',tCogs,cogsCol);
+  const nGross=mk('売上総利益',grossProfit,grossCol);
+
+  // x4左：販管費明細 → 販管費合計・営業利益（BSの明細→中間→中央の流れ）
+  const nS1=mk('給料手当',s1,sgaSubCol);
+  const nS2=mk('支払報酬',s2,sgaCol);
+  const nS3=mk('支払手数料',s3,sgaCol);
+  const nS4=mk('地代家賃',s4,sgaCol);
+  const nS5=mk('減価償却費',s5,cogsCol);
+  const nS6=mk('法定福利費',s6,'#d98880');
+  const nS7=mk('役員報酬',s7,sgaSubCol);
+  const nS8=mk('保険料',s8,sgaCol);
+  const nS9=mk('その他販管費',s9,'#f0a500');
+  const sgaItems=[nS1,nS2,nS3,nS4,nS5,nS6,nS7,nS8,nS9];
+
+  // x4右：販管費合計＋営業利益
+  const nSGA=mk('販管費',tSGA,sgaCol);
+  const nOp=mk('営業利益',Math.max(0,opProfit),opCol);
+
+  // x5：営業外収益・費用・経常利益
+  const nOI=mk('営業外収益',oi,oiCol);
+  const nOE=mk('営業外費用',oe,oeCol);
+  const nOrd=mk('経常利益',Math.max(0,ordProfit),ordCol);
+
+  // x6：特別利益・損失・税前純利益
+  const nSI=mk('特別利益',si,siCol);
+  const nSE=mk('特別損失',se,seCol);
+  const nPre=mk('税前当期純利益',Math.max(0,preProfit),preCol);
+
+  // x7：法人税等・当期純利益
+  const nTax=mk('法人税等',tax,taxCol);
+  const nNet=mk('当期純利益',Math.max(0,netProfit),netCol);
+
+  // ---- レイアウト（BSと同じ方式） ----
+  // x1: 売上明細（BSの資産明細と同じ）
+  layoutGroup(revItems.filter(n=>n.val>0), x1);
+
+  // x2: 売上高（BSの「資産」中央ノードと同じ）
+  nRev.h=Math.max(2,nRev.val*scale);
+  nRev.baseY=MT+(innerH-nRev.h)/2;
+  nRev.baseX=x2;nRev.x=x2+(plNodeXOff[nRev.id]||0);nRev.y=nRev.baseY+(plNodeOff[nRev.id]||0);
+
+  // x3: 売上原価＋粗利（BSの「負債＋純資産」と同じ、売上高の上端に揃える）
+  const cogsH=Math.max(2,nCogs.val*scale);
+  const grossH=Math.max(2,nGross.val*scale);
+  placeAt(nCogs,x3,nRev.baseY);
+  placeAt(nGross,x3,nRev.baseY+cogsH+PAD);
+
+  // x4左：販管費明細（BSの負債明細に相当、粗利の上端に揃える）
+  const sgaValid=sgaItems.filter(n=>n.val>0);
+  const totalSgaDetailH=sgaValid.reduce((s,n)=>s+Math.max(2,n.val*scale),0)+(sgaValid.length-1)*PAD;
+  const sgaTopY=nGross.baseY+(Math.max(2,nGross.h)-totalSgaDetailH)/2;
+  let sy2=sgaTopY;
+  sgaValid.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=sy2;n.baseX=x4;n.x=x4+(plNodeXOff[n.id]||0);n.y=sy2+(plNodeOff[n.id]||0);sy2+=n.h+PAD;});
+
+  // x5左：販管費合計＋営業利益（BSの「流動負債＋固定負債」に相当）
+  const sgaH2=Math.max(2,nSGA.val*scale);
+  const opH=Math.max(2,Math.max(0,opProfit)*scale);
+  placeAt(nSGA,x5,nGross.baseY);
+  placeAt(nOp,x5,nGross.baseY+sgaH2+PAD);
+
+  // x6：営業外（収益・費用）＋経常利益
+  const oiH=Math.max(2,oi*scale);
+  const oeH=Math.max(2,oe*scale);
+  const ordH=Math.max(2,Math.max(0,ordProfit)*scale);
+  const ordBlockH=oiH+PAD+oeH+PAD+ordH;
+  const ordStartY=nOp.baseY+(Math.max(2,opH)-ordBlockH)/2+ordBlockH/2-ordBlockH/2;
+  // 経常利益ブロックはopの中心に揃える
+  const opCY=nOp.baseY+opH/2;
+  const ordBlockStartY=opCY-ordBlockH/2;
+  placeAt(nOI,x6,ordBlockStartY);
+  placeAt(nOE,x6,ordBlockStartY+oiH+PAD);
+  placeAt(nOrd,x6,ordBlockStartY+oiH+PAD+oeH+PAD);
+
+  // x7：特別（利益・損失）＋税前純利益
+  const siH=Math.max(2,si*scale);
+  const seH=Math.max(2,se*scale);
+  const preH=Math.max(2,Math.max(0,preProfit)*scale);
+  const ordCY=nOrd.baseY+ordH/2;
+  const preBlockH=siH+PAD+seH+PAD+preH;
+  const preBlockStartY=ordCY-preBlockH/2;
+  placeAt(nSI,x7,preBlockStartY);
+  placeAt(nSE,x7,preBlockStartY+siH+PAD);
+  placeAt(nPre,x7,preBlockStartY+siH+PAD+seH+PAD);
+
+  // x8：法人税等＋純利益
+  const taxH=Math.max(2,tax*scale);
+  const netH=Math.max(2,Math.max(0,netProfit)*scale);
+  const preCY=nPre.baseY+preH/2;
+  const netBlockStartY=preCY-(taxH+PAD+netH)/2;
+  placeAt(nTax,x8,netBlockStartY);
+  placeAt(nNet,x8,netBlockStartY+taxH+PAD);
+
+  const allNodes=[...revItems,nRev,nCogs,nGross,...sgaValid,nSGA,nOp,nOI,nOE,nOrd,nSI,nSE,nPre,nTax,nNet].filter(n=>n.val>0&&n.h>0);
+
+  const flowsG=svg.append('g'),nodesG=svg.append('g'),labelsG=svg.append('g');
+  const flowDefs=[];
+  const sOff={},tOff={};
+  allNodes.forEach(n=>{sOff[n.id]=0;tOff[n.id]=0;});
+
+  function addFlow(s,t,val){
+    if(!s||!t||!s.h||!t.h||val<=0) return;
+    const fh=Math.max(1,val*scale);
+    flowDefs.push({sId:s.id,tId:t.id,fh,col:s.col,so:sOff[s.id],to:tOff[t.id]});
+    sOff[s.id]+=fh;tOff[t.id]+=fh;
+  }
+
+  // フロー（BSと同じ方向性）
+  revItems.filter(n=>n.val>0).forEach(n=>addFlow(n,nRev,n.val));
+  addFlow(nRev,nCogs,tCogs);
+  addFlow(nRev,nGross,grossProfit);
+  sgaValid.forEach(n=>addFlow(n,nSGA,n.val));
+  addFlow(nGross,nSGA,tSGA);
+  addFlow(nGross,nOp,Math.max(0,opProfit));
+  addFlow(nOI,nOrd,oi);
+  addFlow(nOp,nOrd,Math.max(0,opProfit));
+  addFlow(nOrd,nOE,oe);
+  addFlow(nSI,nPre,si);
+  addFlow(nOrd,nPre,Math.max(0,ordProfit));
+  addFlow(nPre,nSE,se);
+  addFlow(nPre,nTax,tax);
+  addFlow(nPre,nNet,Math.max(0,netProfit));
+
+  function renderFlowsPL(){
+    flowsG.selectAll('path').remove();
+    flowDefs.forEach(f=>{
+      const s=allNodes.find(n=>n.id===f.sId),t=allNodes.find(n=>n.id===f.tId);
+      if(!s||!t) return;
+      flowsG.append('path').attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh)).attr('fill',f.col).attr('opacity',0.5);
     });
   }
 
-  renderFlows();renderNodes();renderLabels();
+  function renderLabelsPL(){
+    labelsG.selectAll('*').remove();
+    if(!showText) return;
+    const midIds=['売上高','売上原価','売上総利益','販管費','営業利益','経常利益','税前当期純利益'];
+    allNodes.filter(n=>n.h>0).forEach(n=>{
+      const isMid=midIds.includes(n.id);
+      const isLeft=n.x<SVG_W/2-50;
+      const cy=n.y+n.h/2;
+      const dv=fmtVal(n.val,unit);
+      const tx=isLeft?n.x-6:n.x+NW+6;
+      const anc=isLeft?'end':'start';
+      const lineH=fs*1.4;
+      const valSize=fs-1;
+      if(isMid){
+        if(n.h>=14){
+          mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',fs,n.col,'middle','700');
+          mkTxt(labelsG,n.x+NW/2,cy-3,n.id,fs+1,'#fff','middle','700');
+          mkTxt(labelsG,n.x+NW/2,cy+fs+2,dv,fs-1,'rgba(255,255,255,0.85)','middle');
+        }
+        return;
+      }
+      const showPct=n.pct>=1;
+      if(showPct){
+        mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',valSize,n.col,'middle','700');
+        mkTxt(labelsG,tx,cy-lineH/2,n.id,fs,n.col,anc,'500');
+        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400');
+      } else {
+        mkTxt(labelsG,tx,cy-lineH/2,n.id,fs,n.col,anc,'500');
+        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400');
+      }
+    });
+    mkTxt(labelsG,ML,MT-8,'売上の部',fs,'#999','start');
+    mkTxt(labelsG,SVG_W-MR,MT-8,'費用・利益の部',fs,'#999','end');
+    mkTxt(labelsG,SVG_W/2,SVG_H-4,'created with サンキースタジオ',8,'#ccc','middle');
+  }
+
+  function renderNodesPL(){
+    nodesG.selectAll('g.ng').remove();
+    allNodes.filter(n=>n.h>0).forEach(n=>{
+      const g=nodesG.append('g').attr('class','ng');
+      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h).attr('rx',1).attr('fill',n.col).style('cursor','grab');
+      makeDraggable(g,n,plNodeOff,plNodeXOff,()=>{renderFlowsPL();renderLabelsPL();});
+    });
+  }
+  renderFlowsPL();renderNodesPL();renderLabelsPL();
 }
 
-function saveSVG(){
-  const svg=document.getElementById('sk');
-  const blob=new Blob([svg.outerHTML],{type:'image/svg+xml'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bs_sankey.svg';a.click();
-}
-
-window.addEventListener('load',()=>setTimeout(draw,50));
+window.addEventListener('load',()=>setTimeout(()=>{drawBS();},50));
 </script>
 </body>
 </html>
