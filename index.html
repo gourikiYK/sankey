@@ -35,7 +35,8 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
 .chart-hdr{padding:8px 14px 6px;border-bottom:1px solid #e8e8e8;background:#fff;flex-shrink:0}
 .chart-title{font-size:16px;font-weight:700;color:#222}
 .chart-sub{font-size:10px;color:#888;margin-top:1px}
-.chart-area{flex:1;overflow:auto;background:#e8e8e8;display:flex;align-items:flex-start;justify-content:center;padding:10px}
+.chart-area{flex:1;overflow:auto;background:#e8e8e8;display:flex;align-items:flex-start;justify-content:center;padding:10px;-webkit-user-select:none;user-select:none}
+.chart-area svg text{-webkit-user-select:none;user-select:none}
 .drag-hint{font-size:10px;color:#aaa;padding:3px 14px;background:#fff;border-top:1px solid #f0f0f0;text-align:center;flex-shrink:0}
 .footer{background:#fff;border-top:1px solid #ddd;padding:6px 12px;flex-shrink:0}
 .footer-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
@@ -57,6 +58,51 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
 .fbtn{padding:4px 9px;border:1px solid #bbb;border-radius:4px;background:#fff;font-size:11px;color:#333;cursor:pointer;white-space:nowrap}
 .fbtn:hover{background:#f0f0f0}
 .bal-badge{font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500}
+
+/* ===== カラーパレットポップアップ ===== */
+#color-popup{
+  position:fixed;
+  z-index:9999;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);
+  padding:10px 12px;
+  display:none;
+  min-width:220px;
+}
+#color-popup.visible{display:block}
+#color-popup .cp-title{font-size:11px;font-weight:700;color:#555;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+#color-popup .cp-close{cursor:pointer;color:#aaa;font-size:14px;line-height:1;padding:0 2px}
+#color-popup .cp-close:hover{color:#333}
+#color-popup .cp-swatches{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+#color-popup .cp-swatch{
+  width:22px;height:22px;border-radius:4px;cursor:pointer;border:2px solid transparent;
+  transition:transform .1s,border-color .1s;flex-shrink:0;
+}
+#color-popup .cp-swatch:hover{transform:scale(1.15);border-color:#555}
+#color-popup .cp-swatch.selected{border-color:#222;box-shadow:0 0 0 1px #fff inset}
+#color-popup .cp-custom-row{display:flex;align-items:center;gap:6px;margin-top:2px}
+#color-popup .cp-custom-row label{font-size:10px;color:#888;white-space:nowrap}
+#color-popup .cp-custom-color{width:32px;height:24px;border:1px solid #ccc;border-radius:4px;padding:1px;cursor:pointer}
+#color-popup .cp-opacity-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+#color-popup .cp-opacity-row label{font-size:10px;color:#888;white-space:nowrap;width:36px}
+#color-popup .cp-opacity-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:#2196F3;outline:none;cursor:pointer}
+#color-popup .cp-opacity-slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#2196F3;cursor:pointer}
+#color-popup .cp-opacity-val{font-size:10px;color:#555;width:28px;text-align:right}
+#color-popup .cp-reset{margin-top:8px;width:100%;padding:4px;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;font-size:11px;color:#555;cursor:pointer}
+#color-popup .cp-reset:hover{background:#e8e8e8}
+#color-popup .cp-eyedropper-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid #ccc;border-radius:5px;
+  background:#fff;font-size:11px;color:#444;cursor:pointer;transition:background .15s,border-color .15s;width:100%;margin-top:6px;
+}
+#color-popup .cp-eyedropper-btn:hover{background:#f0f4ff;border-color:#2196F3;color:#1565c0}
+#color-popup .cp-eyedropper-btn.active{background:#e3f2fd;border-color:#2196F3;color:#1565c0;font-weight:700}
+#color-popup .cp-eyedropper-btn.unsupported{color:#aaa;cursor:not-allowed;border-color:#e0e0e0}
+#color-popup .cp-eyedropper-btn .cp-eye-icon{font-size:14px;line-height:1}
+#color-popup .cp-preview-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+#color-popup .cp-preview-swatch{width:22px;height:22px;border-radius:4px;border:1px solid #ccc;flex-shrink:0}
+#color-popup .cp-preview-label{font-size:10px;color:#888}
 </style>
 </head>
 <body>
@@ -132,7 +178,7 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
         <div class="chart-area" id="chart-area-bs">
           <svg id="sk-bs" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <div class="drag-hint">ノードをドラッグして自由移動 ／ ダブルクリックでリセット</div>
+        <div class="drag-hint">ノードをドラッグして自由移動 ／ <strong>帯・フロー・文字をダブルクリックで色変更</strong> ／ Ctrl+ダブルクリックで位置リセット</div>
       </div>
     </div>
     <div class="footer">
@@ -232,7 +278,7 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
         <div class="chart-area" id="chart-area-pl">
           <svg id="sk-pl" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <div class="drag-hint">ノードをドラッグして自由移動 ／ ダブルクリックでリセット</div>
+        <div class="drag-hint">ノードをドラッグして自由移動 ／ <strong>帯・フロー・文字をダブルクリックで色変更</strong> ／ Ctrl+ダブルクリックで位置リセット</div>
       </div>
     </div>
     <div class="footer">
@@ -268,6 +314,34 @@ h1.app-title{font-size:18px;font-weight:700;color:#111;padding:10px 16px;backgro
 
 </div><!-- /app -->
 
+<!-- ===== カラーパレットポップアップ ===== -->
+<div id="color-popup">
+  <div class="cp-title">
+    <span id="cp-title-label">帯の色を変更</span>
+    <span class="cp-close" onclick="closeColorPopup()">✕</span>
+  </div>
+  <div class="cp-swatches" id="cp-swatches"></div>
+  <div class="cp-custom-row">
+    <label>カスタム:</label>
+    <input type="color" class="cp-custom-color" id="cp-custom-color" value="#2196F3" oninput="onCustomColorChange(this.value)">
+    <span id="cp-hex-label" style="font-size:10px;color:#888">#2196F3</span>
+  </div>
+  <div class="cp-opacity-row" id="cp-opacity-row">
+    <label>透明度:</label>
+    <input type="range" class="cp-opacity-slider" id="cp-opacity" min="0" max="1" step="0.05" value="0.4" oninput="onOpacityChange(this.value)">
+    <span class="cp-opacity-val" id="cp-opacity-val">40%</span>
+  </div>
+  <button class="cp-eyedropper-btn" id="cp-eyedropper-btn" onclick="activateEyedropper()">
+    <span class="cp-eye-icon">🔍</span>
+    <span id="cp-eye-label">スポイトで色を取得</span>
+  </button>
+  <div class="cp-preview-row" id="cp-preview-row" style="display:none">
+    <div class="cp-preview-swatch" id="cp-preview-swatch"></div>
+    <span class="cp-preview-label" id="cp-preview-label">取得した色: —</span>
+  </div>
+  <button class="cp-reset" onclick="resetFlowColor()">↺ デフォルト色に戻す</button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script>
 // ===== タブ切り替え =====
@@ -297,6 +371,252 @@ function saveSVG(svgId,fname){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
 }
 
+// ===== カラーパレット システム =====
+// flowKey = "sId->tId" でユニーク、nodeKey = "node:id"
+const flowColorMap={};   // key -> {hex, opacity}
+const nodeColorMap={};   // nodeId -> hex
+const textColorMap={};   // textKey -> hex  (e.g. "bs:現金及び預金:name", "bs:現金及び預金:val", "bs:現金及び預金:pct")
+const PALETTE_COLORS=[
+  '#e74c3c','#c0392b','#e67e22','#f39c12','#f1c40f',
+  '#2ecc71','#27ae60','#1abc9c','#16a085','#3498db',
+  '#2980b9','#9b59b6','#8e44ad','#34495e','#7f8c8d',
+  '#555555','#333333','#666666','#888888','#aaaaaa',
+  '#e8f5e9','#fff3e0','#e3f2fd','#fce4ec','#f3e5f5',
+];
+
+let _currentFlowKey=null;
+let _currentNodeId=null;   // ノード編集時にセット
+let _currentTextKey=null;  // テキスト編集時にセット
+let _currentRedraw=null;
+let _currentDefaultColor=null;
+
+function flowKey(sId,tId){return sId+'->'+tId;}
+
+function getFlowColor(sId,tId,defaultCol,defaultOpacity){
+  const k=flowKey(sId,tId);
+  if(flowColorMap[k]) return {hex:flowColorMap[k].hex, opacity:flowColorMap[k].opacity};
+  return {hex:defaultCol,opacity:defaultOpacity};
+}
+function getNodeColor(id,defaultCol){
+  return nodeColorMap[id]||defaultCol;
+}
+function getTextColor(key,defaultCol){
+  return textColorMap[key]||defaultCol;
+}
+
+function openTextColorPopup(e,textKey,defaultCol,redrawFn){
+  e.preventDefault();
+  e.stopPropagation();
+  _currentFlowKey=null;
+  _currentNodeId=null;
+  _currentTextKey=textKey;
+  _currentRedraw=redrawFn;
+  _currentDefaultColor=defaultCol;
+  const currentHex=textColorMap[textKey]||defaultCol;
+  _showColorPopup(e, currentHex, 1.0, 'テキスト色: '+textKey.split(':').pop().substring(0,18), false);
+}
+
+function openColorPopup(e,sId,tId,defaultCol,defaultOpacity,redrawFn){
+  e.preventDefault();
+  e.stopPropagation();
+  _currentFlowKey=flowKey(sId,tId);
+  _currentNodeId=null;
+  _currentRedraw=redrawFn;
+  _currentDefaultColor=defaultCol;
+
+  const current=flowColorMap[_currentFlowKey]||{hex:defaultCol,opacity:defaultOpacity};
+  _showColorPopup(e, current.hex, current.opacity, (sId+'→'+tId).substring(0,24), true);
+}
+
+function openNodeColorPopup(e,nodeId,defaultCol,redrawFn){
+  e.preventDefault();
+  e.stopPropagation();
+  _currentFlowKey=null;
+  _currentNodeId=nodeId;
+  _currentRedraw=redrawFn;
+  _currentDefaultColor=defaultCol;
+
+  const currentHex=nodeColorMap[nodeId]||defaultCol;
+  _showColorPopup(e, currentHex, 1.0, '帯: '+nodeId.substring(0,16), false);
+}
+
+function _showColorPopup(e, currentHex, currentOpacity, label, showOpacity){
+  // rgba -> hex 変換（input[type=color]はhexのみ受け付けるため）
+  function toHex(c){
+    if(!c) return '#ffffff';
+    if(c.startsWith('#')) return c.length===4?'#'+c[1]+c[1]+c[2]+c[2]+c[3]+c[3]:c.substring(0,7);
+    const m=c.match(/[\d.]+/g);
+    if(m&&m.length>=3) return '#'+[m[0],m[1],m[2]].map(x=>Math.round(+x).toString(16).padStart(2,'0')).join('');
+    return '#888888';
+  }
+  const safeHex=toHex(currentHex);
+  // スウォッチ生成
+  const sw=document.getElementById('cp-swatches');
+  sw.innerHTML='';
+  PALETTE_COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cp-swatch'+(safeHex===c?' selected':'');
+    d.style.background=c;
+    d.title=c;
+    d.onclick=()=>applyColor(c, showOpacity ? parseFloat(document.getElementById('cp-opacity').value) : 1.0);
+    sw.appendChild(d);
+  });
+
+  // カスタムカラー
+  document.getElementById('cp-custom-color').value=safeHex;
+  document.getElementById('cp-hex-label').textContent=safeHex;
+
+  // 透明度行の表示切り替え
+  document.getElementById('cp-opacity-row').style.display=showOpacity?'flex':'none';
+  document.getElementById('cp-opacity').value=currentOpacity;
+  document.getElementById('cp-opacity-val').textContent=Math.round(currentOpacity*100)+'%';
+
+  // ラベル
+  document.getElementById('cp-title-label').textContent=label;
+
+  // スポイトボタン対応確認
+  const eyeBtn=document.getElementById('cp-eyedropper-btn');
+  const eyeLbl=document.getElementById('cp-eye-label');
+  if(!window.EyeDropper){
+    eyeBtn.classList.add('unsupported');
+    eyeLbl.textContent='スポイト非対応ブラウザ';
+  } else {
+    eyeBtn.classList.remove('unsupported');
+    eyeLbl.textContent='スポイトで色を取得';
+  }
+  // プレビューリセット
+  document.getElementById('cp-preview-row').style.display='none';
+
+  // 位置決め
+  const popup=document.getElementById('color-popup');
+  popup.classList.add('visible');
+  const pw=220,ph=260;
+  let lx=e.clientX+10,ly=e.clientY+10;
+  if(lx+pw>window.innerWidth) lx=e.clientX-pw-10;
+  if(ly+ph>window.innerHeight) ly=e.clientY-ph-10;
+  popup.style.left=lx+'px';
+  popup.style.top=ly+'px';
+}
+
+function applyColor(hex,opacity){
+  if(_currentNodeId){
+    // ノードカラー更新
+    nodeColorMap[_currentNodeId]=hex;
+    document.getElementById('cp-custom-color').value=hex;
+    document.getElementById('cp-hex-label').textContent=hex;
+    document.querySelectorAll('#cp-swatches .cp-swatch').forEach(s=>{
+      s.classList.toggle('selected',rgbToHex(s.style.background)===hex);
+    });
+    if(_currentRedraw) _currentRedraw();
+  } else if(_currentTextKey){
+    // テキストカラー更新
+    textColorMap[_currentTextKey]=hex;
+    document.getElementById('cp-custom-color').value=hex;
+    document.getElementById('cp-hex-label').textContent=hex;
+    document.querySelectorAll('#cp-swatches .cp-swatch').forEach(s=>{
+      s.classList.toggle('selected',rgbToHex(s.style.background)===hex);
+    });
+    if(_currentRedraw) _currentRedraw();
+  } else if(_currentFlowKey){
+    // フローカラー更新
+    flowColorMap[_currentFlowKey]={hex,opacity:parseFloat(opacity)};
+    document.querySelectorAll('#cp-swatches .cp-swatch').forEach(s=>{
+      s.classList.toggle('selected',rgbToHex(s.style.background)===hex);
+    });
+    document.getElementById('cp-custom-color').value=hex;
+    document.getElementById('cp-hex-label').textContent=hex;
+    if(_currentRedraw) _currentRedraw();
+  }
+}
+// 後方互換
+function applyFlowColor(hex,opacity){applyColor(hex,opacity);}
+
+function onCustomColorChange(hex){
+  document.getElementById('cp-hex-label').textContent=hex;
+  const op=parseFloat(document.getElementById('cp-opacity').value);
+  applyColor(hex,op);
+}
+
+function onOpacityChange(val){
+  document.getElementById('cp-opacity-val').textContent=Math.round(val*100)+'%';
+  if(_currentFlowKey){
+    const current=flowColorMap[_currentFlowKey]||{hex:_currentDefaultColor,opacity:0.4};
+    applyColor(current.hex,val);
+  }
+}
+
+function resetFlowColor(){
+  if(_currentNodeId){
+    delete nodeColorMap[_currentNodeId];
+    if(_currentRedraw) _currentRedraw();
+  } else if(_currentTextKey){
+    delete textColorMap[_currentTextKey];
+    if(_currentRedraw) _currentRedraw();
+  } else if(_currentFlowKey){
+    delete flowColorMap[_currentFlowKey];
+    if(_currentRedraw) _currentRedraw();
+  }
+  closeColorPopup();
+}
+
+function closeColorPopup(){
+  document.getElementById('color-popup').classList.remove('visible');
+  _currentFlowKey=null;
+  _currentTextKey=null;
+}
+
+// ===== スポイト（EyeDropper API）=====
+async function activateEyedropper(){
+  const btn=document.getElementById('cp-eyedropper-btn');
+  const lbl=document.getElementById('cp-eye-label');
+  if(!window.EyeDropper){
+    btn.classList.add('unsupported');
+    lbl.textContent='このブラウザは非対応です';
+    return;
+  }
+  btn.classList.add('active');
+  lbl.textContent='画面の色をクリックしてください…';
+  // ポップアップを一時的に隠す（スポイト中に邪魔にならないように）
+  const popup=document.getElementById('color-popup');
+  popup.style.opacity='0.15';
+  popup.style.pointerEvents='none';
+  try{
+    const eyeDropper=new EyeDropper();
+    const result=await eyeDropper.open();
+    const hex=result.sRGBHex;
+    // プレビュー更新
+    document.getElementById('cp-preview-swatch').style.background=hex;
+    document.getElementById('cp-preview-label').textContent='取得した色: '+hex;
+    document.getElementById('cp-preview-row').style.display='flex';
+    // 色適用
+    const op=parseFloat(document.getElementById('cp-opacity').value);
+    applyColor(hex,op);
+    lbl.textContent='スポイトで色を取得';
+  }catch(err){
+    // キャンセル or エラー
+    lbl.textContent='スポイトで色を取得';
+  }finally{
+    btn.classList.remove('active');
+    popup.style.opacity='1';
+    popup.style.pointerEvents='auto';
+  }
+}
+
+// RGB→HEX変換（ブラウザがstyle.backgroundをrgb()で返すので）
+function rgbToHex(rgb){
+  const m=rgb.match(/\d+/g);
+  if(!m||m.length<3) return rgb;
+  return '#'+m.slice(0,3).map(x=>parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
+// クリックで閉じる
+document.addEventListener('click',e=>{
+  const popup=document.getElementById('color-popup');
+  if(!popup.contains(e.target)&&popup.classList.contains('visible')){
+    closeColorPopup();
+  }
+});
+
 // ===== ノードオフセット（BS/PL 独立） =====
 let bsNodeOff={},bsNodeXOff={};
 let plNodeOff={},plNodeXOff={};
@@ -308,7 +628,12 @@ function resetBS(){
   document.getElementById('code-input').value='';
   document.getElementById('f-scale').value=1.0;
   document.getElementById('f-pad').value=8;
-  bsNodeOff={};bsNodeXOff={};drawBS();
+  bsNodeOff={};bsNodeXOff={};
+  // BS フローカラーリセット
+  Object.keys(flowColorMap).forEach(k=>{if(k.includes('->')) delete flowColorMap[k];});
+  Object.keys(nodeColorMap).forEach(k=>{delete nodeColorMap[k];});
+  Object.keys(textColorMap).forEach(k=>{if(k.startsWith('bs:')) delete textColorMap[k];});
+  drawBS();
 }
 
 // ===== PL リセット =====
@@ -323,7 +648,11 @@ function resetPL(){
   Object.entries(PL_DEF).forEach(([k,v])=>{const e=document.getElementById(k);if(e)e.value=v;});
   document.getElementById('pf-scale').value=1.0;
   document.getElementById('pf-pad').value=6;
-  plNodeOff={};plNodeXOff={};drawPL();
+  plNodeOff={};plNodeXOff={};
+  Object.keys(flowColorMap).forEach(k=>{delete flowColorMap[k];});
+  Object.keys(nodeColorMap).forEach(k=>{delete nodeColorMap[k];});
+  Object.keys(textColorMap).forEach(k=>{if(k.startsWith('pl:')) delete textColorMap[k];});
+  drawPL();
 }
 
 // ===== BS コード入力 =====
@@ -348,24 +677,48 @@ function parseCode(){
 }
 
 // ===== ドラッグユーティリティ =====
-function makeDraggable(g,n,nodeOff,nodeXOff,onDrag){
-  let dy0=0,dx0=0,off0=0,offX0=0;
+function makeDraggable(g,n,nodeOff,nodeXOff,onDrag,redrawFn){
+  let dy0=0,dx0=0,off0=0,offX0=0,dragged=false;
   g.call(d3.drag()
-    .on('start',function(e){dy0=e.y;dx0=e.x;off0=nodeOff[n.id]||0;offX0=nodeXOff[n.id]||0;g.select('rect').attr('opacity',0.75);})
+    .on('start',function(e){dy0=e.y;dx0=e.x;off0=nodeOff[n.id]||0;offX0=nodeXOff[n.id]||0;dragged=false;g.select('rect').attr('opacity',0.75);})
     .on('drag',function(e){
+      if(Math.abs(e.y-dy0)>2||Math.abs(e.x-dx0)>2) dragged=true;
       nodeOff[n.id]=off0+(e.y-dy0);nodeXOff[n.id]=offX0+(e.x-dx0);
       n.y=n.baseY+(nodeOff[n.id]||0);n.x=n.baseX+(nodeXOff[n.id]||0);
       g.select('rect').attr('y',n.y).attr('x',n.x);onDrag();
     })
     .on('end',function(){g.select('rect').attr('opacity',1);})
   );
-  g.on('dblclick',function(){nodeOff[n.id]=0;nodeXOff[n.id]=0;n.y=n.baseY;n.x=n.baseX;g.select('rect').attr('y',n.y).attr('x',n.x);onDrag();});
+  g.on('dblclick',function(event){
+    event.stopPropagation();
+    if(event.ctrlKey||event.metaKey){
+      // Ctrl+ダブルクリック → 位置リセット
+      nodeOff[n.id]=0;nodeXOff[n.id]=0;n.y=n.baseY;n.x=n.baseX;
+      g.select('rect').attr('y',n.y).attr('x',n.x);onDrag();
+    } else {
+      // ダブルクリック → 色変更ポップアップ
+      openNodeColorPopup(event,n.id,n.col,redrawFn||onDrag);
+    }
+  });
 }
 
-function mkTxt(g,x,y,str,size,col,anchor,weight){
-  g.append('text').attr('x',x).attr('y',y).attr('font-size',size).attr('fill',col)
+function mkTxt(g,x,y,str,size,col,anchor,weight,textKey,redrawFn){
+  const tc=textKey?getTextColor(textKey,col):col;
+  const el=g.append('text').attr('x',x).attr('y',y).attr('font-size',size).attr('fill',tc)
     .attr('text-anchor',anchor||'middle').attr('font-weight',weight||'400')
     .attr('font-family','sans-serif').text(str);
+  if(textKey&&redrawFn){
+    el.style('cursor','pointer')
+      .style('user-select','none')
+      .on('mousedown',function(event){event.preventDefault();})
+      .on('dblclick',function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        openTextColorPopup(event,textKey,col,redrawFn);
+      })
+      .on('mouseenter',function(){d3.select(this).attr('opacity',0.65);})
+      .on('mouseleave',function(){d3.select(this).attr('opacity',1);});
+  }
 }
 function buildPath(ax,ay,bx,by,h){
   const cx=(ax+bx)/2;
@@ -504,12 +857,25 @@ function drawBS(){
     lr_eq.forEach(n=>addFlow(mc3,n,n.val));
   }
 
+  const DEFAULT_FLOW_OPACITY=0.4;
+
   function renderFlowsBS(){
     flowsG.selectAll('path').remove();
     flowDefs.forEach(f=>{
       const s=allNodes.find(n=>n.id===f.sId),t=allNodes.find(n=>n.id===f.tId);
       if(!s||!t) return;
-      flowsG.append('path').attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh)).attr('fill',f.col).attr('opacity',0.4);
+      const fc=getFlowColor(f.sId,f.tId,f.col,DEFAULT_FLOW_OPACITY);
+      flowsG.append('path')
+        .attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh))
+        .attr('fill',fc.hex)
+        .attr('opacity',fc.opacity)
+        .style('cursor','pointer')
+        .on('dblclick',function(event){
+          event.stopPropagation();
+          openColorPopup(event,f.sId,f.tId,f.col,DEFAULT_FLOW_OPACITY,renderFlowsBS);
+        })
+        .on('mouseenter',function(){d3.select(this).attr('opacity',Math.min(1,fc.opacity+0.2));})
+        .on('mouseleave',function(){d3.select(this).attr('opacity',fc.opacity);});
     });
   }
   function renderLabelsBS(){
@@ -525,11 +891,12 @@ function drawBS(){
       const dv=fmtVal(n.val,unit);
       const tx=isLeft?n.x-6:n.x+NW+6;
       const anc=isLeft?'end':'start';
+      const rd=()=>{renderFlowsBS();renderNodesBS();renderLabelsBS();};
       if(isMid){
         if(n.h>=14){
-          mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',fs,n.col,'middle','700');
-          mkTxt(labelsG,n.x+NW/2,cy-3,n.id,fs+1,'#fff','middle','700');
-          mkTxt(labelsG,n.x+NW/2,cy+fs+2,dv,fs-1,'rgba(255,255,255,0.85)','middle');
+          mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',fs,n.col,'middle','700','bs:'+n.id+':pct',rd);
+          mkTxt(labelsG,n.x+NW/2,cy-3,n.id,fs+1,'#fff','middle','700','bs:'+n.id+':name',rd);
+          mkTxt(labelsG,n.x+NW/2,cy+fs+2,dv,fs-1,'#ffffff','middle','400','bs:'+n.id+':val',rd);
         }
         return;
       }
@@ -539,13 +906,13 @@ function drawBS(){
       const lineH=fs*1.4;
       const showPct=n.pct>=1;
       if(showPct){
-        mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',valSize,n.col,'middle','700');
+        mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',valSize,n.col,'middle','700','bs:'+n.id+':pct',rd);
         const startY=cy-lineH;
-        mkTxt(labelsG,tx,startY,n.id,nameSize,n.col,anc,isMidNode?'700':'500');
-        mkTxt(labelsG,tx,startY+lineH,dv,valSize,'#777',anc,'400');
+        mkTxt(labelsG,tx,startY,n.id,nameSize,n.col,anc,isMidNode?'700':'500','bs:'+n.id+':name',rd);
+        mkTxt(labelsG,tx,startY+lineH,dv,valSize,'#777',anc,'400','bs:'+n.id+':val',rd);
       } else {
-        mkTxt(labelsG,tx,cy-lineH/2,n.id,nameSize,n.col,anc,isMidNode?'700':'500');
-        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400');
+        mkTxt(labelsG,tx,cy-lineH/2,n.id,nameSize,n.col,anc,isMidNode?'700':'500','bs:'+n.id+':name',rd);
+        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400','bs:'+n.id+':val',rd);
       }
     });
     mkTxt(labelsG,ML,MT-8,lblAsset,fs,'#999','start');
@@ -555,9 +922,10 @@ function drawBS(){
   function renderNodesBS(){
     nodesG.selectAll('g.ng').remove();
     allNodes.filter(n=>n.h>0).forEach(n=>{
+      const col=getNodeColor(n.id,n.col);
       const g=nodesG.append('g').attr('class','ng');
-      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h).attr('rx',1).attr('fill',n.col).style('cursor','grab');
-      makeDraggable(g,n,bsNodeOff,bsNodeXOff,()=>{renderFlowsBS();renderLabelsBS();});
+      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h).attr('rx',1).attr('fill',col).style('cursor','grab');
+      makeDraggable(g,n,bsNodeOff,bsNodeXOff,()=>{renderFlowsBS();renderLabelsBS();},()=>{renderNodesBS();renderFlowsBS();renderLabelsBS();});
     });
   }
   renderFlowsBS();renderNodesBS();renderLabelsBS();
@@ -586,7 +954,6 @@ function drawPL(){
   const MT=parseInt(document.getElementById('pmg-t').value)||30;
   const MB=parseInt(document.getElementById('pmg-b').value)||18;
 
-  // 値取得
   const r1=gv('p-r1'),r2=gv('p-r2'),r3=gv('p-r3'),r4=gv('p-r4'),r5=gv('p-r5');
   const tRev=r1+r2+r3+r4+r5;
   const c1=gv('p-c1'),c2=gv('p-c2');
@@ -608,8 +975,6 @@ function drawPL(){
   const innerH=SVG_H-MT-MB;
   const scale=(innerH/Math.max(tRev,1))*scaleMulti;
 
-  // BSと同じ6列構成
-  // x1=売上明細, x2=売上高(中央左), x3=売上原価/粗利(中央右), x4=販管費/営業利益, x5=経常・特別, x6=税・純利益
   const usableW=SVG_W-ML-MR;
   const cols=8;
   const colW=usableW/cols;
@@ -619,7 +984,6 @@ function drawPL(){
   const svg=d3.select(svgEl);
   if(!bgTransparent) svg.append('rect').attr('width',SVG_W).attr('height',SVG_H).attr('fill',bgColor);
 
-  // BSのlayoutGroupと同じ関数
   function layoutGroup(items,xPos){
     const bars=items.filter(n=>n.val>0);
     const totalH=bars.reduce((s,n)=>s+Math.max(2,n.val*scale),0)+(bars.length-1)*PAD;
@@ -633,36 +997,23 @@ function drawPL(){
   }
   function mk(id,val,col){return{id,val:Math.max(0,val),col,pct:pct(Math.max(0,val),tRev),h:0,baseY:0,baseX:0,x:0,y:0};}
 
-  // ---- 色：BSに倣いグレー→赤→緑の系統 ----
-  // 売上明細：グレー系（BS資産明細と同じ感覚）
   const revCol='#555';
-  // 売上高（中央左）：濃いグレー（BS資産合計と同じ）
   const revMidCol='#333';
-  // 売上原価：赤系（BS負債と同じ）
   const cogsCol='#e74c3c';
   const cogsSubCol='#c0392b';
-  // 売上総利益→営業利益：緑系（BS純資産と同じ）
   const grossCol='#27ae60';
   const opCol='#1e8449';
-  // 販管費：オレンジ系
   const sgaCol='#e67e22';
   const sgaSubCol='#d35400';
-  // 営業外費用：薄赤
   const oeCol='#e57373';
-  // 営業外収益・特別利益：緑
   const oiCol='#52be80';
   const siCol='#27ae60';
   const seCol='#e74c3c';
-  // 経常利益
   const ordCol='#2ecc71';
-  // 税前
   const preCol='#16a085';
-  // 法人税
   const taxCol='#95a5a6';
-  // 当期純利益
   const netCol='#27ae60';
 
-  // ---- ノード定義 ----
   const nR1=mk('完成工事高',r1,revCol);
   const nR2=mk('売上高(単)',r2,revCol);
   const nR3=mk('卸売売上',r3,'#888');
@@ -670,14 +1021,10 @@ function drawPL(){
   const nR5=mk('ライセンス料',r5,'#888');
   const revItems=[nR1,nR2,nR3,nR4,nR5];
 
-  // 中央左：売上高（BSの「資産」に相当）
   const nRev=mk('売上高',tRev,revMidCol);
-
-  // 中央右：売上原価＋売上総利益（BSの「負債＋純資産」に相当）
   const nCogs=mk('売上原価',tCogs,cogsCol);
   const nGross=mk('売上総利益',grossProfit,grossCol);
 
-  // x4左：販管費明細 → 販管費合計・営業利益（BSの明細→中間→中央の流れ）
   const nS1=mk('給料手当',s1,sgaSubCol);
   const nS2=mk('支払報酬',s2,sgaCol);
   const nS3=mk('支払手数料',s3,sgaCol);
@@ -689,66 +1036,52 @@ function drawPL(){
   const nS9=mk('その他販管費',s9,'#f0a500');
   const sgaItems=[nS1,nS2,nS3,nS4,nS5,nS6,nS7,nS8,nS9];
 
-  // x4右：販管費合計＋営業利益
   const nSGA=mk('販管費',tSGA,sgaCol);
   const nOp=mk('営業利益',Math.max(0,opProfit),opCol);
 
-  // x5：営業外収益・費用・経常利益
   const nOI=mk('営業外収益',oi,oiCol);
   const nOE=mk('営業外費用',oe,oeCol);
   const nOrd=mk('経常利益',Math.max(0,ordProfit),ordCol);
 
-  // x6：特別利益・損失・税前純利益
   const nSI=mk('特別利益',si,siCol);
   const nSE=mk('特別損失',se,seCol);
   const nPre=mk('税前当期純利益',Math.max(0,preProfit),preCol);
 
-  // x7：法人税等・当期純利益
   const nTax=mk('法人税等',tax,taxCol);
   const nNet=mk('当期純利益',Math.max(0,netProfit),netCol);
 
-  // ---- レイアウト（BSと同じ方式） ----
-  // x1: 売上明細（BSの資産明細と同じ）
   layoutGroup(revItems.filter(n=>n.val>0), x1);
 
-  // x2: 売上高（BSの「資産」中央ノードと同じ）
   nRev.h=Math.max(2,nRev.val*scale);
   nRev.baseY=MT+(innerH-nRev.h)/2;
   nRev.baseX=x2;nRev.x=x2+(plNodeXOff[nRev.id]||0);nRev.y=nRev.baseY+(plNodeOff[nRev.id]||0);
 
-  // x3: 売上原価＋粗利（BSの「負債＋純資産」と同じ、売上高の上端に揃える）
   const cogsH=Math.max(2,nCogs.val*scale);
   const grossH=Math.max(2,nGross.val*scale);
   placeAt(nCogs,x3,nRev.baseY);
   placeAt(nGross,x3,nRev.baseY+cogsH+PAD);
 
-  // x4左：販管費明細（BSの負債明細に相当、粗利の上端に揃える）
   const sgaValid=sgaItems.filter(n=>n.val>0);
   const totalSgaDetailH=sgaValid.reduce((s,n)=>s+Math.max(2,n.val*scale),0)+(sgaValid.length-1)*PAD;
   const sgaTopY=nGross.baseY+(Math.max(2,nGross.h)-totalSgaDetailH)/2;
   let sy2=sgaTopY;
   sgaValid.forEach(n=>{n.h=Math.max(2,n.val*scale);n.baseY=sy2;n.baseX=x4;n.x=x4+(plNodeXOff[n.id]||0);n.y=sy2+(plNodeOff[n.id]||0);sy2+=n.h+PAD;});
 
-  // x5左：販管費合計＋営業利益（BSの「流動負債＋固定負債」に相当）
   const sgaH2=Math.max(2,nSGA.val*scale);
   const opH=Math.max(2,Math.max(0,opProfit)*scale);
   placeAt(nSGA,x5,nGross.baseY);
   placeAt(nOp,x5,nGross.baseY+sgaH2+PAD);
 
-  // x6：営業外（収益・費用）＋経常利益
   const oiH=Math.max(2,oi*scale);
   const oeH=Math.max(2,oe*scale);
   const ordH=Math.max(2,Math.max(0,ordProfit)*scale);
-  const ordBlockH=oiH+PAD+oeH+PAD+ordH;
-  const ordStartY=nOp.baseY+(Math.max(2,opH)-ordBlockH)/2+ordBlockH/2-ordBlockH/2;
-  // 経常利益ブロックはopの中心に揃える
   const opCY=nOp.baseY+opH/2;
+  const ordBlockH=oiH+PAD+oeH+PAD+ordH;
   const ordBlockStartY=opCY-ordBlockH/2;
   placeAt(nOI,x6,ordBlockStartY);
   placeAt(nOE,x6,ordBlockStartY+oiH+PAD);
   placeAt(nOrd,x6,ordBlockStartY+oiH+PAD+oeH+PAD);
 
-  // x7：特別（利益・損失）＋税前純利益
   const siH=Math.max(2,si*scale);
   const seH=Math.max(2,se*scale);
   const preH=Math.max(2,Math.max(0,preProfit)*scale);
@@ -759,7 +1092,6 @@ function drawPL(){
   placeAt(nSE,x7,preBlockStartY+siH+PAD);
   placeAt(nPre,x7,preBlockStartY+siH+PAD+seH+PAD);
 
-  // x8：法人税等＋純利益
   const taxH=Math.max(2,tax*scale);
   const netH=Math.max(2,Math.max(0,netProfit)*scale);
   const preCY=nPre.baseY+preH/2;
@@ -781,7 +1113,6 @@ function drawPL(){
     sOff[s.id]+=fh;tOff[t.id]+=fh;
   }
 
-  // フロー（BSと同じ方向性）
   revItems.filter(n=>n.val>0).forEach(n=>addFlow(n,nRev,n.val));
   addFlow(nRev,nCogs,tCogs);
   addFlow(nRev,nGross,grossProfit);
@@ -797,12 +1128,25 @@ function drawPL(){
   addFlow(nPre,nTax,tax);
   addFlow(nPre,nNet,Math.max(0,netProfit));
 
+  const DEFAULT_PL_FLOW_OPACITY=0.5;
+
   function renderFlowsPL(){
     flowsG.selectAll('path').remove();
     flowDefs.forEach(f=>{
       const s=allNodes.find(n=>n.id===f.sId),t=allNodes.find(n=>n.id===f.tId);
       if(!s||!t) return;
-      flowsG.append('path').attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh)).attr('fill',f.col).attr('opacity',0.5);
+      const fc=getFlowColor(f.sId,f.tId,f.col,DEFAULT_PL_FLOW_OPACITY);
+      flowsG.append('path')
+        .attr('d',buildPath(s.x+NW,s.y+f.so,t.x,t.y+f.to,f.fh))
+        .attr('fill',fc.hex)
+        .attr('opacity',fc.opacity)
+        .style('cursor','pointer')
+        .on('dblclick',function(event){
+          event.stopPropagation();
+          openColorPopup(event,f.sId,f.tId,f.col,DEFAULT_PL_FLOW_OPACITY,renderFlowsPL);
+        })
+        .on('mouseenter',function(){d3.select(this).attr('opacity',Math.min(1,fc.opacity+0.2));})
+        .on('mouseleave',function(){d3.select(this).attr('opacity',fc.opacity);});
     });
   }
 
@@ -810,6 +1154,7 @@ function drawPL(){
     labelsG.selectAll('*').remove();
     if(!showText) return;
     const midIds=['売上高','売上原価','売上総利益','販管費','営業利益','経常利益','税前当期純利益'];
+    const rd=()=>{renderFlowsPL();renderNodesPL();renderLabelsPL();};
     allNodes.filter(n=>n.h>0).forEach(n=>{
       const isMid=midIds.includes(n.id);
       const isLeft=n.x<SVG_W/2-50;
@@ -821,20 +1166,20 @@ function drawPL(){
       const valSize=fs-1;
       if(isMid){
         if(n.h>=14){
-          mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',fs,n.col,'middle','700');
-          mkTxt(labelsG,n.x+NW/2,cy-3,n.id,fs+1,'#fff','middle','700');
-          mkTxt(labelsG,n.x+NW/2,cy+fs+2,dv,fs-1,'rgba(255,255,255,0.85)','middle');
+          mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',fs,n.col,'middle','700','pl:'+n.id+':pct',rd);
+          mkTxt(labelsG,n.x+NW/2,cy-3,n.id,fs+1,'#fff','middle','700','pl:'+n.id+':name',rd);
+          mkTxt(labelsG,n.x+NW/2,cy+fs+2,dv,fs-1,'#ffffff','middle','400','pl:'+n.id+':val',rd);
         }
         return;
       }
       const showPct=n.pct>=1;
       if(showPct){
-        mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',valSize,n.col,'middle','700');
-        mkTxt(labelsG,tx,cy-lineH/2,n.id,fs,n.col,anc,'500');
-        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400');
+        mkTxt(labelsG,n.x+NW/2,n.y-4,n.pct.toFixed(1)+'%',valSize,n.col,'middle','700','pl:'+n.id+':pct',rd);
+        mkTxt(labelsG,tx,cy-lineH/2,n.id,fs,n.col,anc,'500','pl:'+n.id+':name',rd);
+        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400','pl:'+n.id+':val',rd);
       } else {
-        mkTxt(labelsG,tx,cy-lineH/2,n.id,fs,n.col,anc,'500');
-        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400');
+        mkTxt(labelsG,tx,cy-lineH/2,n.id,fs,n.col,anc,'500','pl:'+n.id+':name',rd);
+        mkTxt(labelsG,tx,cy+lineH/2,dv,valSize,'#777',anc,'400','pl:'+n.id+':val',rd);
       }
     });
     mkTxt(labelsG,ML,MT-8,'売上の部',fs,'#999','start');
@@ -845,9 +1190,10 @@ function drawPL(){
   function renderNodesPL(){
     nodesG.selectAll('g.ng').remove();
     allNodes.filter(n=>n.h>0).forEach(n=>{
+      const col=getNodeColor(n.id,n.col);
       const g=nodesG.append('g').attr('class','ng');
-      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h).attr('rx',1).attr('fill',n.col).style('cursor','grab');
-      makeDraggable(g,n,plNodeOff,plNodeXOff,()=>{renderFlowsPL();renderLabelsPL();});
+      g.append('rect').attr('x',n.x).attr('y',n.y).attr('width',NW).attr('height',n.h).attr('rx',1).attr('fill',col).style('cursor','grab');
+      makeDraggable(g,n,plNodeOff,plNodeXOff,()=>{renderFlowsPL();renderLabelsPL();},()=>{renderNodesPL();renderFlowsPL();renderLabelsPL();});
     });
   }
   renderFlowsPL();renderNodesPL();renderLabelsPL();
